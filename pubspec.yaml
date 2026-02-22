@@ -62,9 +62,6 @@ dependencies:
   # URL Launcher
   url_launcher: ^6.2.5
   
-  # MQTT (optional, uncomment if needed)
-  # mqtt_client: ^10.0.0
-  
   # Connectivity (optional, for network info)
   # connectivity_plus: ^5.0.2
 

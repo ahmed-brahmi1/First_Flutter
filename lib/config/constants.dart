@@ -6,11 +6,6 @@ class AppConstants {
   static const String baseUrl = 'https://api.smartpet.com';
   static const String apiVersion = '/v1';
   
-  // MQTT Configuration
-  static const String mqttBroker = 'mqtt.smartpet.com';
-  static const int mqttPort = 1883;
-  static const String mqttClientId = 'smartpet_mobile';
-  
   // Storage Keys
   static const String tokenKey = 'auth_token';
   static const String userIdKey = 'user_id';
