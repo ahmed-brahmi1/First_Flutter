@@ -1,6 +1,6 @@
 import 'dart:convert';
 import 'package:http/http.dart' as http;
-import '../models/sensor_model.dart';
+import 'package:smartpet/features/health/data/models/sensor_model.dart';
 
 class SensorApiService {
   static const String baseUrl =
