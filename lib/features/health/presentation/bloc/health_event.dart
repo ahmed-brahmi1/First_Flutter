@@ -20,4 +20,7 @@ class LoadTemperatureHistory extends HealthEvent {
 class LoadAIPredictions extends HealthEvent {
   const LoadAIPredictions();
 }
+class LoadLatestSensor extends HealthEvent {
+  const LoadLatestSensor();
+}
 

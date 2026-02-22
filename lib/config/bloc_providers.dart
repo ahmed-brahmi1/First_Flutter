@@ -38,7 +38,7 @@ import '../features/audio/domain/usecases/start_two_way_audio.dart';
 import '../features/audio/domain/usecases/send_voice_command.dart';
 import '../features/audio/data/repositories/audio_repository_impl.dart';
 import '../features/audio/data/datasources/audio_remote_datasource.dart';
-
+import '../features/health/domain/usecases/get_latest_sensor.dart';
 class BlocProviders {
   static Widget wrapWithDashboardBloc(Widget child) {
     return BlocProvider<DashboardBloc>(
@@ -101,6 +101,7 @@ class BlocProviders {
         return HealthBloc(
           getTemperatureHistory: GetTemperatureHistory(repository),
           getAIPredictions: GetAIPredictions(repository),
+          getLatestSensor: GetLatestSensor(repository),
         );
       },
       child: child,

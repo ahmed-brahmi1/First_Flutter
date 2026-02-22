@@ -7,6 +7,7 @@ import '../../domain/entities/health_log.dart';
 import '../../domain/repositories/health_repository.dart';
 import '../datasources/health_remote_datasource.dart';
 import '../models/health_log_model.dart';
+import 'package:smartpet/features/data/models/sensor_model.dart';
 
 class HealthRepositoryImpl implements HealthRepository {
   final HealthRemoteDataSource remoteDataSource;
@@ -88,6 +89,10 @@ class HealthRepositoryImpl implements HealthRepository {
     } else {
       return const Left(NetworkFailure('No internet connection'));
     }
+  }
+  @override
+  Future<SensorModel> getLatestSensor() {
+    return remoteDataSource.getLatestSensor();
   }
 }
 

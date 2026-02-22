@@ -8,6 +8,7 @@ import '../bloc/health_event.dart';
 import '../bloc/health_state.dart';
 import '../widgets/temperature_chart.dart';
 import '../widgets/ai_insight_card.dart';
+import 'package:smartpet/features/data/models/sensor_model.dart';
 
 class HealthDashboardPage extends StatefulWidget {
   const HealthDashboardPage({super.key});
@@ -30,6 +31,7 @@ class _HealthDashboardPageState extends State<HealthDashboardPage> {
             ),
           );
       context.read<HealthBloc>().add(const LoadAIPredictions());
+      context.read<HealthBloc>().add(const LoadLatestSensor());
     });
   }
 
@@ -60,13 +62,7 @@ class _HealthDashboardPageState extends State<HealthDashboardPage> {
                   const SizedBox(height: 16),
                   ElevatedButton(
                     onPressed: () {
-                      final now = DateTime.now();
-                      context.read<HealthBloc>().add(
-                            LoadTemperatureHistory(
-                              start: now.subtract(const Duration(days: 7)),
-                              end: now,
-                            ),
-                          );
+                      context.read<HealthBloc>().add(const LoadLatestSensor());
                     },
                     child: const Text('Retry'),
                   ),
@@ -74,13 +70,21 @@ class _HealthDashboardPageState extends State<HealthDashboardPage> {
               ),
             );
           } else if (state is HealthLoaded) {
+            final sensor = state.latestSensor;
+
+            if (sensor == null) {
+              return const Center(
+                child: Text("Aucune donnée disponible"),
+              );
+            }
+
             return SingleChildScrollView(
               padding: const EdgeInsets.all(16.0),
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.stretch,
                 children: [
                   // Current Temperature Display
-                  _buildCurrentTempCard(),
+                  _buildCurrentTempCard(state),
                   const SizedBox(height: 16),
                   // Trend Graph
                   if (state.temperatureHistory != null)
@@ -91,7 +95,7 @@ class _HealthDashboardPageState extends State<HealthDashboardPage> {
                     AIInsightCard(predictions: state.aiPredictions!),
                   const SizedBox(height: 16),
                   // Health Stats
-                  _buildHealthStats(),
+                  _buildHealthStats(state),
                   const SizedBox(height: 16),
                   // Vet Contact Button
                   _buildVetContactButton(context),
@@ -113,6 +117,7 @@ class _HealthDashboardPageState extends State<HealthDashboardPage> {
                 ),
               );
           context.read<HealthBloc>().add(const LoadAIPredictions());
+          context.read<HealthBloc>().add(const LoadLatestSensor());
         },
         icon: const Icon(Icons.refresh),
         label: const Text('Refresh'),
@@ -120,7 +125,16 @@ class _HealthDashboardPageState extends State<HealthDashboardPage> {
     );
   }
 
-  Widget _buildCurrentTempCard() {
+  Widget _buildCurrentTempCard(HealthLoaded state) {
+    final sensor = state.latestSensor!;
+    String temperature = '--°C';
+    String heartRate = '-- bpm';
+
+    if (sensor != null) {
+      temperature = '${sensor.temperature.toStringAsFixed(1)}°C';
+      heartRate = '${sensor.heartRate} bpm';
+    }
+
     return Card(
       elevation: 4,
       color: AppTheme.primaryBlue,
@@ -143,12 +157,20 @@ class _HealthDashboardPageState extends State<HealthDashboardPage> {
               ),
             ),
             const SizedBox(height: 8),
-            const Text(
-              '38.5°C',
-              style: TextStyle(
+            Text(
+              temperature,
+              style: const TextStyle(
                 color: Colors.white,
                 fontSize: 48,
                 fontWeight: FontWeight.bold,
+              ),
+            ),
+            const SizedBox(height: 8),
+            Text(
+              'Heart Rate: $heartRate',
+              style: const TextStyle(
+                color: Colors.white,
+                fontSize: 18,
               ),
             ),
             const SizedBox(height: 8),
@@ -172,7 +194,18 @@ class _HealthDashboardPageState extends State<HealthDashboardPage> {
     );
   }
 
-  Widget _buildHealthStats() {
+  Widget _buildHealthStats(HealthLoaded state) {
+    final sensor = state.latestSensor!;
+    String heartRate = '-- bpm';
+    String steps = '--';
+    String healthScore = '--';
+
+    if (sensor != null) {
+      heartRate = '${sensor.heartRate} bpm';
+      steps = '${sensor.steps}';
+      healthScore = '${sensor.healthScore}';
+    }
+
     return Card(
       elevation: 4,
       child: Padding(
@@ -193,19 +226,19 @@ class _HealthDashboardPageState extends State<HealthDashboardPage> {
               children: [
                 _buildStatItem(
                   'Heart Rate',
-                  '85 bpm',
+                  heartRate,
                   Icons.favorite,
                   Colors.red,
                 ),
                 _buildStatItem(
-                  'Activity',
-                  '60%',
+                  'Steps',
+                  steps,
                   Icons.directions_run,
                   AppTheme.primaryBlue,
                 ),
                 _buildStatItem(
-                  'Status',
-                  'Healthy',
+                  'Health Score',
+                  healthScore,
                   Icons.check_circle,
                   Colors.green,
                 ),
@@ -284,4 +317,3 @@ class _HealthDashboardPageState extends State<HealthDashboardPage> {
     );
   }
 }
-

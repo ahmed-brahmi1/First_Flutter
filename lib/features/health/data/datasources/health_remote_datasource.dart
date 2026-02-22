@@ -3,10 +3,12 @@ import 'dart:convert';
 import '../../../../config/constants.dart';
 import '../../../../core/errors/exceptions.dart';
 import '../models/health_log_model.dart';
+import 'package:smartpet/features/data/models/sensor_model.dart';
 
 abstract class HealthRemoteDataSource {
   Future<List<HealthLogModel>> getTemperatureHistory(String token, DateTime start, DateTime end);
   Future<Map<String, dynamic>> getAIPredictions(String token);
+  Future<SensorModel> getLatestSensor();
 }
 
 class HealthRemoteDataSourceImpl implements HealthRemoteDataSource {
@@ -67,5 +69,26 @@ class HealthRemoteDataSourceImpl implements HealthRemoteDataSource {
       throw NetworkException('Network error: $e');
     }
   }
+   @override
+    Future<SensorModel> getLatestSensor() async {  // ← AJOUTEZ CETTE MÉTHODE
+      try {
+        final response = await client.get(
+          Uri.parse('http://10.0.2.2:8081/api/sensor/latest'),
+        ).timeout(AppConstants.connectionTimeout);
+
+        if (response.statusCode == 200) {
+          return SensorModel.fromJson(json.decode(response.body));
+        } else {
+          throw ServerException(
+            'Failed to load latest sensor: ${response.body}',
+            response.statusCode,
+          );
+        }
+      } catch (e) {
+        if (e is ServerException) rethrow;
+        throw NetworkException('Network error: $e');
+      }
+    }
+
 }
 
