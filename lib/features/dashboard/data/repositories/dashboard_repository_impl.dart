@@ -41,11 +41,11 @@ class DashboardRepositoryImpl implements DashboardRepository {
     
     if (await networkInfo.isConnected) {
       try {
-        // TODO: Get token from secure storage
-        const token = '';
-        final status = await remoteDataSource.getPetStatus(token);
+        final status = await remoteDataSource.getPetStatus();
         await localDataSource.cachePetStatus(status);
         return Right(status);
+      } on AuthenticationException catch (e) {
+        return Left(AuthenticationFailure(e.message));
       } on ServerException catch (e) {
         return Left(ServerFailure(e.message));
       } on NetworkException catch (e) {
@@ -84,11 +84,11 @@ class DashboardRepositoryImpl implements DashboardRepository {
     
     if (await networkInfo.isConnected) {
       try {
-        // TODO: Get token from secure storage
-        const token = '';
-        final location = await remoteDataSource.getLocation(token);
+        final location = await remoteDataSource.getLocation();
         await localDataSource.cacheLocation(location);
         return Right(location);
+      } on AuthenticationException catch (e) {
+        return Left(AuthenticationFailure(e.message));
       } on ServerException catch (e) {
         return Left(ServerFailure(e.message));
       } on NetworkException catch (e) {
@@ -127,11 +127,11 @@ class DashboardRepositoryImpl implements DashboardRepository {
     
     if (await networkInfo.isConnected) {
       try {
-        // TODO: Get token from secure storage
-        const token = '';
-        final healthData = await remoteDataSource.getHealthData(token);
+        final healthData = await remoteDataSource.getHealthData();
         await localDataSource.cacheHealthData(healthData);
         return Right(healthData);
+      } on AuthenticationException catch (e) {
+        return Left(AuthenticationFailure(e.message));
       } on ServerException catch (e) {
         return Left(ServerFailure(e.message));
       } on NetworkException catch (e) {

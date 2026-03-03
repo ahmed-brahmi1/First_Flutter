@@ -1,39 +1,30 @@
-import 'package:http/http.dart' as http;
 import 'dart:convert';
-import '../../../../config/constants.dart';
+
 import '../../../../core/errors/exceptions.dart';
+import '../../../../core/network/api_client.dart';
 import '../models/feeding_schedule_model.dart';
 
 abstract class FeedingRemoteDataSource {
-  Future<List<FeedingScheduleModel>> getFeedingLogs(String token);
-  Future<void> triggerManualFeed(String token);
-  Future<FeedingScheduleModel> setSchedule(String token, FeedingScheduleModel schedule);
+  Future<List<FeedingScheduleModel>> getFeedingLogs();
+  Future<void> triggerManualFeed();
+  Future<FeedingScheduleModel> setSchedule(FeedingScheduleModel schedule);
+  Future<FeedingScheduleModel> updateSchedule(String id, FeedingScheduleModel schedule);
+  Future<void> deleteSchedule(String id);
 }
 
 class FeedingRemoteDataSourceImpl implements FeedingRemoteDataSource {
-  final http.Client client;
+  final ApiClient apiClient;
 
-  FeedingRemoteDataSourceImpl({required this.client});
+  FeedingRemoteDataSourceImpl({required this.apiClient});
 
   @override
-  Future<List<FeedingScheduleModel>> getFeedingLogs(String token) async {
+  Future<List<FeedingScheduleModel>> getFeedingLogs() async {
     try {
-      final response = await client.get(
-        Uri.parse('${AppConstants.baseUrl}${AppConstants.apiVersion}/feeding/logs'),
-        headers: {'Authorization': 'Bearer $token'},
-      ).timeout(AppConstants.connectionTimeout);
-
-      if (response.statusCode == 200) {
-        final jsonData = json.decode(response.body) as List<dynamic>;
-        return jsonData
-            .map((item) => FeedingScheduleModel.fromJson(item as Map<String, dynamic>))
-            .toList();
-      } else {
-        throw ServerException(
-          'Failed to get feeding logs: ${response.body}',
-          response.statusCode,
-        );
-      }
+      final response = await apiClient.get('/feeding-schedule');
+      final list = apiClient.decodeJsonOrThrow<List<dynamic>>(response);
+      return list
+          .map((e) => FeedingScheduleModel.fromJson(e as Map<String, dynamic>))
+          .toList();
     } catch (e) {
       if (e is ServerException) rethrow;
       throw NetworkException('Network error: $e');
@@ -41,22 +32,21 @@ class FeedingRemoteDataSourceImpl implements FeedingRemoteDataSource {
   }
 
   @override
-  Future<void> triggerManualFeed(String token) async {
-    try {
-      final response = await client.post(
-        Uri.parse('${AppConstants.baseUrl}${AppConstants.apiVersion}/feeding/manual'),
-        headers: {
-          'Content-Type': 'application/json',
-          'Authorization': 'Bearer $token',
-        },
-      ).timeout(AppConstants.connectionTimeout);
+  Future<void> triggerManualFeed() async {
+    throw ServerException('Manual feed trigger not supported by backend', 501);
+  }
 
-      if (response.statusCode != 200 && response.statusCode != 201) {
-        throw ServerException(
-          'Failed to trigger manual feed: ${response.body}',
-          response.statusCode,
-        );
-      }
+  @override
+  Future<FeedingScheduleModel> setSchedule(FeedingScheduleModel schedule) async {
+    try {
+      final body = schedule.toJson();
+      body.remove('id');
+      final response = await apiClient.post(
+        '/feeding-schedule',
+        body: json.encode(body),
+      );
+      final jsonData = apiClient.decodeJsonOrThrow<Map<String, dynamic>>(response);
+      return FeedingScheduleModel.fromJson(jsonData);
     } catch (e) {
       if (e is ServerException) rethrow;
       throw NetworkException('Network error: $e');
@@ -64,33 +54,32 @@ class FeedingRemoteDataSourceImpl implements FeedingRemoteDataSource {
   }
 
   @override
-  Future<FeedingScheduleModel> setSchedule(
-    String token,
+  Future<FeedingScheduleModel> updateSchedule(
+    String id,
     FeedingScheduleModel schedule,
   ) async {
     try {
-      final response = await client.post(
-        Uri.parse('${AppConstants.baseUrl}${AppConstants.apiVersion}/feeding/schedule'),
-        headers: {
-          'Content-Type': 'application/json',
-          'Authorization': 'Bearer $token',
-        },
-        body: json.encode(schedule.toJson()),
-      ).timeout(AppConstants.connectionTimeout);
+      final body = schedule.toJson();
+      body.remove('id');
+      final response = await apiClient.patch(
+        '/feeding-schedule/$id',
+        body: json.encode(body),
+      );
+      final jsonData = apiClient.decodeJsonOrThrow<Map<String, dynamic>>(response);
+      return FeedingScheduleModel.fromJson(jsonData);
+    } catch (e) {
+      if (e is ServerException) rethrow;
+      throw NetworkException('Network error: $e');
+    }
+  }
 
-      if (response.statusCode == 200 || response.statusCode == 201) {
-        final jsonData = json.decode(response.body) as Map<String, dynamic>;
-        return FeedingScheduleModel.fromJson(jsonData);
-      } else {
-        throw ServerException(
-          'Failed to set schedule: ${response.body}',
-          response.statusCode,
-        );
-      }
+  @override
+  Future<void> deleteSchedule(String id) async {
+    try {
+      await apiClient.delete('/feeding-schedule/$id');
     } catch (e) {
       if (e is ServerException) rethrow;
       throw NetworkException('Network error: $e');
     }
   }
 }
-

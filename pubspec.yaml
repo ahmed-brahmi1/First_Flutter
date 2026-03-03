@@ -62,8 +62,11 @@ dependencies:
   # URL Launcher
   url_launcher: ^6.2.5
   
-  # Connectivity (optional, for network info)
-  # connectivity_plus: ^5.0.2
+  # Connectivity (for network info)
+  connectivity_plus: ^5.0.2
+
+  # Socket.IO for real-time device-data (smart-pet-backend gateway)
+  socket_io_client: ^2.0.3+1
 
 dev_dependencies:
   flutter_test:

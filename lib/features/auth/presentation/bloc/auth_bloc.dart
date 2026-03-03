@@ -2,6 +2,7 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import '../../domain/usecases/login.dart';
 import '../../domain/usecases/register.dart';
 import '../../domain/usecases/logout.dart';
+import '../../domain/usecases/restore_session.dart';
 import '../../../../core/usecases/usecase.dart';
 import 'auth_event.dart';
 import 'auth_state.dart';
@@ -10,11 +11,13 @@ class AuthBloc extends Bloc<AuthEvent, AuthState> {
   final Login login;
   final Register register;
   final Logout logout;
+  final RestoreSession restoreSession;
 
   AuthBloc({
     required this.login,
     required this.register,
     required this.logout,
+    required this.restoreSession,
   }) : super(AuthInitial()) {
     on<LoginRequested>(_onLoginRequested);
     on<RegisterRequested>(_onRegisterRequested);
@@ -72,8 +75,13 @@ class AuthBloc extends Bloc<AuthEvent, AuthState> {
     AuthStatusChecked event,
     Emitter<AuthState> emit,
   ) async {
-    // TODO: Check if user is already authenticated
-    emit(AuthUnauthenticated());
+    final result = await restoreSession(const NoParams());
+    result.fold(
+      (_) => emit(AuthUnauthenticated()),
+      (user) => user != null
+          ? emit(AuthAuthenticated(user))
+          : emit(AuthUnauthenticated()),
+    );
   }
 }
 

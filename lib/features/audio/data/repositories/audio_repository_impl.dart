@@ -25,9 +25,7 @@ class AudioRepositoryImpl implements AudioRepository {
     
     if (await networkInfo.isConnected) {
       try {
-        // TODO: Get token from secure storage
-        const token = '';
-        await remoteDataSource.startTwoWayAudio(token);
+        await remoteDataSource.startTwoWayAudio();
         return const Right(null);
       } on ServerException catch (e) {
         return Left(ServerFailure(e.message));
@@ -51,9 +49,7 @@ class AudioRepositoryImpl implements AudioRepository {
     
     if (await networkInfo.isConnected) {
       try {
-        // TODO: Get token from secure storage
-        const token = '';
-        await remoteDataSource.sendVoiceCommand(token, command);
+        await remoteDataSource.sendVoiceCommand(command);
         return const Right(null);
       } on ServerException catch (e) {
         return Left(ServerFailure(e.message));
@@ -77,9 +73,7 @@ class AudioRepositoryImpl implements AudioRepository {
     
     if (await networkInfo.isConnected) {
       try {
-        // TODO: Get token from secure storage
-        const token = '';
-        await remoteDataSource.stopAudio(token);
+        await remoteDataSource.stopAudio();
         return const Right(null);
       } on ServerException catch (e) {
         return Left(ServerFailure(e.message));

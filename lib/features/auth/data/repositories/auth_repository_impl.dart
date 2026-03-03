@@ -4,6 +4,7 @@ import '../../../../core/errors/exceptions.dart';
 import '../../../../core/errors/failures.dart';
 import '../../../../core/network/network_info.dart';
 import '../../domain/entities/user.dart';
+import '../models/user_model.dart';
 import '../../domain/repositories/auth_repository.dart';
 import '../datasources/auth_local_datasource.dart';
 import '../datasources/auth_remote_datasource.dart';
@@ -39,8 +40,22 @@ class AuthRepositoryImpl implements AuthRepository {
     // Real API mode
     if (await networkInfo.isConnected) {
       try {
-        final user = await remoteDataSource.login(email, password);
+        final payload = await remoteDataSource.login(email, password);
+        final userJson = payload['user'] as Map<String, dynamic>;
+        final accessToken = payload['access_token'] as String?;
+        final refreshToken = payload['refresh_token'] as String?;
+        final expiresAt = payload['expires_at'] as int?;
+
+        final user = UserModel.fromJson(userJson);
+
         await localDataSource.cacheUser(user);
+        if (accessToken != null) {
+          await localDataSource.cacheToken(accessToken);
+        }
+        if (refreshToken != null) {
+          await localDataSource.cacheRefreshToken(refreshToken);
+        }
+        await localDataSource.cacheTokenExpiry(expiresAt);
         return Right(user);
       } on ServerException catch (e) {
         return Left(ServerFailure(e.message));
@@ -76,8 +91,15 @@ class AuthRepositoryImpl implements AuthRepository {
     // Real API mode
     if (await networkInfo.isConnected) {
       try {
-        final user = await remoteDataSource.register(email, password, name);
+        final payload = await remoteDataSource.register(
+          email,
+          password,
+          name,
+        );
+        final userJson = payload['user'] as Map<String, dynamic>;
+        final user = UserModel.fromJson(userJson);
         await localDataSource.cacheUser(user);
+        // Note: register does not return tokens; user will log in afterwards.
         return Right(user);
       } on ServerException catch (e) {
         return Left(ServerFailure(e.message));
@@ -94,10 +116,6 @@ class AuthRepositoryImpl implements AuthRepository {
   @override
   Future<Either<Failure, void>> logout() async {
     try {
-      final token = await localDataSource.getCachedToken();
-      if (token != null && await networkInfo.isConnected) {
-        await remoteDataSource.logout(token);
-      }
       await localDataSource.clearCache();
       return const Right(null);
     } on ServerException catch (e) {
@@ -108,5 +126,14 @@ class AuthRepositoryImpl implements AuthRepository {
       return Left(ServerFailure('Unexpected error: $e'));
     }
   }
+
+  @override
+  Future<User?> getCachedUser() => localDataSource.getCachedUser();
+
+  @override
+  Future<String?> getCachedToken() => localDataSource.getCachedToken();
+
+  @override
+  Future<int?> getCachedTokenExpiry() => localDataSource.getCachedTokenExpiry();
 }
 

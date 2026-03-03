@@ -1,14 +1,19 @@
+import 'package:connectivity_plus/connectivity_plus.dart';
+
 abstract class NetworkInfo {
   Future<bool> get isConnected;
 }
 
 class NetworkInfoImpl implements NetworkInfo {
-  // This would typically use connectivity_plus package
-  // For now, we'll implement a basic version
+  NetworkInfoImpl({Connectivity? connectivity})
+      : _connectivity = connectivity ?? Connectivity();
+
+  final Connectivity _connectivity;
+
   @override
   Future<bool> get isConnected async {
-    // TODO: Implement actual network connectivity check
-    return true;
+    final result = await _connectivity.checkConnectivity();
+    return result != ConnectivityResult.none;
   }
 }
 
