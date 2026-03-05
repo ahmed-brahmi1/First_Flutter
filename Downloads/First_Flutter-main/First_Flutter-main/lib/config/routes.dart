@@ -23,6 +23,7 @@ class AppRoutes {
 
   static Route<dynamic> generateRoute(RouteSettings settings) {
     switch (settings.name) {
+      case '/':
       case login:
         return MaterialPageRoute(builder: (_) => const LoginPage());
       case register:

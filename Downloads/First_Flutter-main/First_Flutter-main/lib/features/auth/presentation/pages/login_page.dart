@@ -42,23 +42,24 @@ class LoginPage extends StatelessWidget {
               inputDecorationTheme: InputDecorationTheme(
                 border: OutlineInputBorder(
                   borderRadius: BorderRadius.circular(12),
-                  borderSide: const BorderSide(color: Color(0xFFD4A017)),
+                  borderSide: const BorderSide(color: Color(0xFF9E9E9E)), // elegant grey
                 ),
                 enabledBorder: OutlineInputBorder(
                   borderRadius: BorderRadius.circular(12),
-                  borderSide: const BorderSide(color: Color(0xFFC9A84C), width: 1.5),
+                  borderSide: const BorderSide(color: Color(0xFFA9A9A9), width: 1.5), // elegant light grey
                 ),
                 focusedBorder: OutlineInputBorder(
                   borderRadius: BorderRadius.circular(12),
-                  borderSide: const BorderSide(color: Color(0xFFFFE066), width: 2),
+                  borderSide: const BorderSide(color: Color(0xFFD4A017), width: 2), // imperial gold
                 ),
-                labelStyle: const TextStyle(color: Color(0xFFE8C84A)),
-                floatingLabelStyle: const TextStyle(
-                  color: Color(0xFFFFE066),
+                labelStyle: GoogleFonts.playfairDisplay(color: const Color(0xFFA9A9A9), fontSize: 16),
+                floatingLabelStyle: GoogleFonts.greatVibes(
+                  color: const Color(0xFFD4A017), // imperial gold pour les titres animés
+                  fontSize: 26,
                   fontWeight: FontWeight.w600,
                 ),
-                hintStyle: TextStyle(color: Colors.white.withValues(alpha: 0.4)),
-                prefixIconColor: const Color(0xFFD4A017),
+                hintStyle: GoogleFonts.playfairDisplay(color: Colors.white.withValues(alpha: 0.4)),
+                prefixIconColor: const Color(0xFFA9A9A9), // elegant grey
                 filled: true,
                 fillColor: Colors.black.withValues(alpha: 0.35),
               ),
@@ -74,7 +75,8 @@ class LoginPage extends StatelessWidget {
               ),
               textButtonTheme: TextButtonThemeData(
                 style: TextButton.styleFrom(
-                  foregroundColor: const Color(0xFFE8C84A),
+                  foregroundColor: const Color(0xFFA9A9A9), // elegant grey
+                  textStyle: GoogleFonts.playfairDisplay(fontSize: 16),
                 ),
               ),
             ),
@@ -131,9 +133,12 @@ class LoginPage extends StatelessWidget {
                         onPressed: () {
                           Navigator.of(context).pushNamed(AppRoutes.register);
                         },
-                        child: const Text(
+                        child: Text(
                           'Don\'t have an account? Register',
-                          style: TextStyle(color: Colors.white70),
+                          style: GoogleFonts.playfairDisplay(
+                            color: const Color(0xFFA9A9A9),
+                            fontSize: 15,
+                          ),
                         ),
                       ),
                     ],

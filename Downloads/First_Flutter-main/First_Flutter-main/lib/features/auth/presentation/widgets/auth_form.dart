@@ -3,6 +3,7 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import '../bloc/auth_bloc.dart';
 import '../bloc/auth_event.dart';
 import '../bloc/auth_state.dart';
+import 'package:google_fonts/google_fonts.dart';
 
 class AuthForm extends StatefulWidget {
   final bool isLogin;
@@ -76,6 +77,7 @@ class _AuthFormState extends State<AuthForm> {
               if (!widget.isLogin) ...[
                 TextFormField(
                   controller: _nameController,
+                  style: GoogleFonts.playfairDisplay(color: Colors.white),
                   decoration: const InputDecoration(
                     labelText: 'Name',
                     prefixIcon: Icon(Icons.person),
@@ -91,6 +93,7 @@ class _AuthFormState extends State<AuthForm> {
               ],
               TextFormField(
                 controller: _emailController,
+                style: GoogleFonts.playfairDisplay(color: Colors.white),
                 decoration: const InputDecoration(
                   labelText: 'Email',
                   prefixIcon: Icon(Icons.email),
@@ -109,6 +112,7 @@ class _AuthFormState extends State<AuthForm> {
               const SizedBox(height: 16),
               TextFormField(
                 controller: _passwordController,
+                style: GoogleFonts.playfairDisplay(color: Colors.white),
                 decoration: const InputDecoration(
                   labelText: 'Password',
                   prefixIcon: Icon(Icons.lock),
@@ -136,16 +140,16 @@ class _AuthFormState extends State<AuthForm> {
                         });
                       },
                     ),
-                    const Text(
+                    Text(
                       'Remember me',
-                      style: TextStyle(color: Color(0xFFE8C84A)),
+                      style: GoogleFonts.playfairDisplay(color: const Color(0xFFA9A9A9), fontSize: 15),
                     ),
                     const Spacer(),
                     TextButton(
                       onPressed: () {
                         // TODO: Implement forgot password
                       },
-                      child: const Text('Forgot Password?'),
+                      child: Text('Forgot Password?', style: GoogleFonts.playfairDisplay(color: const Color(0xFFA9A9A9), fontSize: 15)),
                     ),
                   ],
                 ),
@@ -213,14 +217,14 @@ class _AuthFormState extends State<AuthForm> {
                           )
                         : Text(
                             widget.isLogin ? 'Login' : 'Register',
-                            style: const TextStyle(
-                              color: Color(0xFF3B2800),
-                              fontSize: 16,
-                              fontWeight: FontWeight.w800,
-                              letterSpacing: 1.5,
+                            style: GoogleFonts.greatVibes(
+                              color: const Color(0xFF3B2800), // Marron très foncé pour contraster avec l'or
+                              fontSize: 32, // Plus grand pour la signature
+                              fontWeight: FontWeight.w500,
+                              letterSpacing: 1.2,
                               shadows: [
-                                Shadow(
-                                  color: Color(0x55FFFFFF),
+                                const Shadow(
+                                  color: Color(0x33FFFFFF),
                                   blurRadius: 4,
                                   offset: Offset(0, 1),
                                 ),

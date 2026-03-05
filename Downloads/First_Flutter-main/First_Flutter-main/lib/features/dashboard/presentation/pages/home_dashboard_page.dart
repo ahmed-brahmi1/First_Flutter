@@ -8,6 +8,8 @@ import '../bloc/dashboard_state.dart';
 import '../widgets/status_card.dart';
 import '../widgets/location_map.dart';
 import '../widgets/health_chart.dart';
+import 'package:video_player/video_player.dart';
+import 'package:google_fonts/google_fonts.dart';
 
 class HomeDashboardPage extends StatelessWidget {
   const HomeDashboardPage({super.key});
@@ -15,18 +17,33 @@ class HomeDashboardPage extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+      extendBodyBehindAppBar: true,
       appBar: AppBar(
-        title: const Text('SmartPet Dashboard'),
+        title: Text(
+          'SmartPet',
+          style: GoogleFonts.greatVibes(color: const Color(0xFFD4A017), fontSize: 36),
+        ),
+        backgroundColor: Colors.transparent,
+        elevation: 0,
+        iconTheme: const IconThemeData(color: Colors.white),
         actions: [
           IconButton(
-            icon: const Icon(Icons.settings),
+            icon: const Icon(Icons.settings, color: Colors.white),
             onPressed: () {
               Navigator.of(context).pushNamed(AppRoutes.settings);
             },
           ),
         ],
       ),
-      body: BlocBuilder<DashboardBloc, DashboardState>(
+      body: Stack(
+        fit: StackFit.expand,
+        children: [
+          const VideoBackground(),
+          Container(
+            color: Colors.black.withValues(alpha: 0.35),
+          ),
+          SafeArea(
+            child: BlocBuilder<DashboardBloc, DashboardState>(
         builder: (context, state) {
           if (state is DashboardLoading) {
             return const Center(child: CircularProgressIndicator());
@@ -168,10 +185,13 @@ class HomeDashboardPage extends StatelessWidget {
                 ],
               ),
             );
-          } else {
-            return const Center(child: Text('No data available'));
-          }
-        },
+              } else {
+                return const Center(child: Text('No data available', style: TextStyle(color: Colors.white)));
+              }
+            },
+          ),
+        ),
+        ],
       ),
       floatingActionButton: FloatingActionButton.extended(
         onPressed: () {
@@ -185,18 +205,22 @@ class HomeDashboardPage extends StatelessWidget {
 
   Widget _buildQuickActions(BuildContext context) {
     return Card(
-      color: AppTheme.primaryBlue,
+      color: Colors.black.withValues(alpha: 0.6),
+      elevation: 0,
+      shape: RoundedRectangleBorder(
+        borderRadius: BorderRadius.circular(16),
+        side: BorderSide(color: const Color(0xFFD4A017).withValues(alpha: 0.3)),
+      ),
       child: Padding(
         padding: const EdgeInsets.all(16.0),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            const Text(
+            Text(
               'Quick Actions',
-              style: TextStyle(
-                color: Colors.white,
-                fontSize: 20,
-                fontWeight: FontWeight.bold,
+              style: GoogleFonts.greatVibes(
+                color: const Color(0xFFD4A017),
+                fontSize: 28,
               ),
             ),
             const SizedBox(height: 16),
@@ -208,21 +232,18 @@ class HomeDashboardPage extends StatelessWidget {
                   icon: Icons.restaurant,
                   label: 'Feed Now',
                   onTap: () => Navigator.of(context).pushNamed(AppRoutes.feeding),
-                  color: AppTheme.accentYellow,
                 ),
                 _buildQuickActionButton(
                   context,
                   icon: Icons.phone,
                   label: 'Call Pet',
                   onTap: () => Navigator.of(context).pushNamed(AppRoutes.audio),
-                  color: AppTheme.accentYellow,
                 ),
                 _buildQuickActionButton(
                   context,
                   icon: Icons.location_on,
                   label: 'Track',
                   onTap: () => Navigator.of(context).pushNamed(AppRoutes.map),
-                  color: AppTheme.accentYellow,
                 ),
               ],
             ),
@@ -237,28 +258,28 @@ class HomeDashboardPage extends StatelessWidget {
     required IconData icon,
     required String label,
     required VoidCallback onTap,
-    required Color color,
   }) {
     return InkWell(
       onTap: onTap,
       borderRadius: BorderRadius.circular(12),
       child: Container(
-        padding: const EdgeInsets.all(12),
+        padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
         decoration: BoxDecoration(
-          color: color,
+          color: Colors.white.withValues(alpha: 0.05),
           borderRadius: BorderRadius.circular(12),
+          border: Border.all(color: const Color(0xFFD4A017).withValues(alpha: 0.5)),
         ),
         child: Column(
           mainAxisSize: MainAxisSize.min,
           children: [
-            Icon(icon, color: Colors.black87, size: 28),
-            const SizedBox(height: 4),
+            Icon(icon, color: const Color(0xFFD4A017), size: 28),
+            const SizedBox(height: 8),
             Text(
               label,
-              style: const TextStyle(
-                color: Colors.black87,
-                fontSize: 12,
-                fontWeight: FontWeight.w500,
+              style: GoogleFonts.playfairDisplay(
+                color: const Color(0xFFA9A9A9),
+                fontSize: 14,
+                fontWeight: FontWeight.w600,
               ),
             ),
           ],
@@ -275,21 +296,16 @@ class HomeDashboardPage extends StatelessWidget {
     required List<Widget> children,
   }) {
     return Card(
-      elevation: 4,
+      elevation: 0,
+      color: Colors.transparent,
       shape: RoundedRectangleBorder(
         borderRadius: BorderRadius.circular(16),
       ),
       child: Container(
         decoration: BoxDecoration(
+          color: Colors.black.withValues(alpha: 0.5),
           borderRadius: BorderRadius.circular(16),
-          gradient: LinearGradient(
-            begin: Alignment.topLeft,
-            end: Alignment.bottomRight,
-            colors: [
-              color.withOpacity(0.1),
-              color.withOpacity(0.05),
-            ],
-          ),
+          border: Border.all(color: const Color(0xFFD4A017).withValues(alpha: 0.2)),
         ),
         child: Padding(
           padding: const EdgeInsets.all(16.0),
@@ -301,18 +317,18 @@ class HomeDashboardPage extends StatelessWidget {
                   Container(
                     padding: const EdgeInsets.all(8),
                     decoration: BoxDecoration(
-                      color: color,
+                      color: Colors.white.withValues(alpha: 0.05),
                       borderRadius: BorderRadius.circular(8),
+                      border: Border.all(color: const Color(0xFFD4A017).withValues(alpha: 0.5)),
                     ),
-                    child: Icon(icon, color: Colors.white, size: 24),
+                    child: Icon(icon, color: const Color(0xFFD4A017), size: 24),
                   ),
                   const SizedBox(width: 12),
                   Text(
                     title,
-                    style: TextStyle(
-                      fontSize: 20,
-                      fontWeight: FontWeight.bold,
-                      color: color,
+                    style: GoogleFonts.greatVibes(
+                      fontSize: 28,
+                      color: const Color(0xFFD4A017),
                     ),
                   ),
                 ],
@@ -338,26 +354,27 @@ class HomeDashboardPage extends StatelessWidget {
       leading: Container(
         padding: const EdgeInsets.all(8),
         decoration: BoxDecoration(
-          color: color.withOpacity(0.2),
+          color: Colors.white.withValues(alpha: 0.05),
           borderRadius: BorderRadius.circular(8),
         ),
-        child: Icon(icon, color: color, size: 24),
+        child: Icon(icon, color: const Color(0xFFD4A017), size: 24),
       ),
       title: Text(
         title,
-        style: const TextStyle(
+        style: GoogleFonts.playfairDisplay(
           fontWeight: FontWeight.w600,
+          color: Colors.white,
           fontSize: 16,
         ),
       ),
       subtitle: Text(
         subtitle,
-        style: TextStyle(
-          fontSize: 12,
-          color: Colors.grey[600],
+        style: GoogleFonts.playfairDisplay(
+          fontSize: 13,
+          color: const Color(0xFFA9A9A9),
         ),
       ),
-      trailing: Icon(Icons.chevron_right, color: color),
+      trailing: const Icon(Icons.chevron_right, color: Color(0xFFA9A9A9)),
       onTap: onTap,
       shape: RoundedRectangleBorder(
         borderRadius: BorderRadius.circular(8),
@@ -365,4 +382,52 @@ class HomeDashboardPage extends StatelessWidget {
     );
   }
 }
+
+class VideoBackground extends StatefulWidget {
+  const VideoBackground({super.key});
+
+  @override
+  State<VideoBackground> createState() => _VideoBackgroundState();
+}
+
+class _VideoBackgroundState extends State<VideoBackground> {
+  late VideoPlayerController _controller;
+
+  @override
+  void initState() {
+    super.initState();
+    _controller = VideoPlayerController.asset('assets/videos/Dashboard_Background.mp4')
+      ..initialize().then((_) {
+        _controller.setVolume(0.0);
+        _controller.setLooping(true);
+        _controller.play();
+        setState(() {});
+      });
+  }
+
+  @override
+  void dispose() {
+    _controller.dispose();
+    super.dispose();
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    if (_controller.value.isInitialized) {
+      return SizedBox.expand(
+        child: FittedBox(
+          fit: BoxFit.cover,
+          child: SizedBox(
+            width: _controller.value.size.width,
+            height: _controller.value.size.height,
+            child: VideoPlayer(_controller),
+          ),
+        ),
+      );
+    } else {
+      return Container(color: Colors.black);
+    }
+  }
+}
+
 
