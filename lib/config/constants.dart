@@ -1,20 +1,14 @@
 class AppConstants {
-  // Demo Mode - Set to true to use mock data instead of real API
-  static const bool useDemoMode = true;
+  // Demo Mode - Set to false to use real NestJS API; true for mock data only
+  static const bool useDemoMode = false;
   
-  // API Endpoints
-  static const String baseUrl = 'https://api.smartpet.com';
-  static const String apiVersion = '/v1';
-  
-  // MQTT Configuration
-  static const String mqttBroker = 'mqtt.smartpet.com';
-  static const int mqttPort = 1883;
-  static const String mqttClientId = 'smartpet_mobile';
-  
+  // API Endpoints (smart-pet-backend: no global prefix)
+  static const String baseUrl = 'http://192.168.100.4:3000';
+  static const String apiVersion = '';
+
   // Storage Keys
-  static const String tokenKey = 'auth_token';
-  static const String userIdKey = 'user_id';
-  static const String refreshTokenKey = 'refresh_token';
+  // NOTE: Auth storage keys are centrally defined in
+  // `AuthLocalDataSourceImpl` to avoid duplication.
   
   // Timeouts
   static const Duration connectionTimeout = Duration(seconds: 30);

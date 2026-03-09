@@ -43,9 +43,7 @@ class FeedingRepositoryImpl implements FeedingRepository {
     
     if (await networkInfo.isConnected) {
       try {
-        // TODO: Get token from secure storage
-        const token = '';
-        final logs = await remoteDataSource.getFeedingLogs(token);
+        final logs = await remoteDataSource.getFeedingLogs();
         return Right(logs);
       } on ServerException catch (e) {
         return Left(ServerFailure(e.message));
@@ -69,9 +67,7 @@ class FeedingRepositoryImpl implements FeedingRepository {
     
     if (await networkInfo.isConnected) {
       try {
-        // TODO: Get token from secure storage
-        const token = '';
-        await remoteDataSource.triggerManualFeed(token);
+        await remoteDataSource.triggerManualFeed();
         return const Right(null);
       } on ServerException catch (e) {
         return Left(ServerFailure(e.message));
@@ -91,16 +87,15 @@ class FeedingRepositoryImpl implements FeedingRepository {
   ) async {
     if (await networkInfo.isConnected) {
       try {
-        // TODO: Get token from secure storage
-        const token = '';
         final scheduleModel = FeedingScheduleModel(
           id: schedule.id,
           time: schedule.time,
           amount: schedule.amount,
           isActive: schedule.isActive,
           daysOfWeek: schedule.daysOfWeek,
+          deviceId: schedule.deviceId,
         );
-        final result = await remoteDataSource.setSchedule(token, scheduleModel);
+        final result = await remoteDataSource.setSchedule(scheduleModel);
         return Right(result);
       } on ServerException catch (e) {
         return Left(ServerFailure(e.message));

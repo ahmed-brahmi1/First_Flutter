@@ -8,6 +8,10 @@ abstract class AuthLocalDataSource {
   Future<UserModel?> getCachedUser();
   Future<void> cacheToken(String token);
   Future<String?> getCachedToken();
+  Future<void> cacheRefreshToken(String refreshToken);
+  Future<String?> getCachedRefreshToken();
+  Future<void> cacheTokenExpiry(int? expiresAt);
+  Future<int?> getCachedTokenExpiry();
   Future<void> clearCache();
 }
 
@@ -15,6 +19,8 @@ class AuthLocalDataSourceImpl implements AuthLocalDataSource {
   final SharedPreferences sharedPreferences;
   static const String cachedUserKey = 'CACHED_USER';
   static const String cachedTokenKey = 'CACHED_TOKEN';
+  static const String cachedRefreshTokenKey = 'CACHED_REFRESH_TOKEN';
+  static const String cachedTokenExpiryKey = 'CACHED_TOKEN_EXPIRY';
 
   AuthLocalDataSourceImpl({required this.sharedPreferences});
 
@@ -63,9 +69,50 @@ class AuthLocalDataSourceImpl implements AuthLocalDataSource {
     try {
       await sharedPreferences.remove(cachedUserKey);
       await sharedPreferences.remove(cachedTokenKey);
+      await sharedPreferences.remove(cachedRefreshTokenKey);
+      await sharedPreferences.remove(cachedTokenExpiryKey);
     } catch (e) {
       throw CacheException('Failed to clear cache: $e');
     }
   }
-}
 
+  @override
+  Future<void> cacheRefreshToken(String refreshToken) async {
+    try {
+      await sharedPreferences.setString(cachedRefreshTokenKey, refreshToken);
+    } catch (e) {
+      throw CacheException('Failed to cache refresh token: $e');
+    }
+  }
+
+  @override
+  Future<String?> getCachedRefreshToken() async {
+    try {
+      return sharedPreferences.getString(cachedRefreshTokenKey);
+    } catch (e) {
+      throw CacheException('Failed to get cached refresh token: $e');
+    }
+  }
+
+  @override
+  Future<void> cacheTokenExpiry(int? expiresAt) async {
+    try {
+      if (expiresAt == null) {
+        await sharedPreferences.remove(cachedTokenExpiryKey);
+      } else {
+        await sharedPreferences.setInt(cachedTokenExpiryKey, expiresAt);
+      }
+    } catch (e) {
+      throw CacheException('Failed to cache token expiry: $e');
+    }
+  }
+
+  @override
+  Future<int?> getCachedTokenExpiry() async {
+    try {
+      return sharedPreferences.getInt(cachedTokenExpiryKey);
+    } catch (e) {
+      throw CacheException('Failed to get cached token expiry: $e');
+    }
+  }
+}

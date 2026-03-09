@@ -57,9 +57,7 @@ class AlertRepositoryImpl implements AlertRepository {
     
     if (await networkInfo.isConnected) {
       try {
-        // TODO: Get token from secure storage
-        const token = '';
-        final alerts = await remoteDataSource.getAlerts(token);
+        final alerts = await remoteDataSource.getAlerts();
         await localDataSource.cacheAlerts(alerts);
         return Right(alerts);
       } on ServerException catch (e) {
@@ -97,9 +95,7 @@ class AlertRepositoryImpl implements AlertRepository {
     
     if (await networkInfo.isConnected) {
       try {
-        // TODO: Get token from secure storage
-        const token = '';
-        await remoteDataSource.markAlertRead(token, alertId);
+        await remoteDataSource.markAlertRead(alertId);
         return const Right(null);
       } on ServerException catch (e) {
         return Left(ServerFailure(e.message));
@@ -117,9 +113,7 @@ class AlertRepositoryImpl implements AlertRepository {
   Future<Either<Failure, void>> subscribePushNotifications(String deviceToken) async {
     if (await networkInfo.isConnected) {
       try {
-        // TODO: Get token from secure storage
-        const token = '';
-        await remoteDataSource.subscribePushNotifications(token, deviceToken);
+        await remoteDataSource.subscribePushNotifications(deviceToken);
         return const Right(null);
       } on ServerException catch (e) {
         return Left(ServerFailure(e.message));

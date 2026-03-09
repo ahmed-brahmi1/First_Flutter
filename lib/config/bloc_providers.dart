@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:http/http.dart' as http;
+import '../core/network/api_client.dart';
 import '../core/network/network_info.dart';
 import '../features/dashboard/presentation/bloc/dashboard_bloc.dart';
 import '../features/dashboard/presentation/bloc/dashboard_event.dart';
@@ -44,9 +44,9 @@ class BlocProviders {
     return BlocProvider<DashboardBloc>(
       create: (context) {
         final networkInfo = context.read<NetworkInfo>();
-        final client = context.read<http.Client>();
+        final apiClient = context.read<ApiClient>();
 
-        final remoteDataSource = DashboardRemoteDataSourceImpl(client: client);
+        final remoteDataSource = DashboardRemoteDataSourceImpl(apiClient: apiClient);
         final localDataSource = DashboardLocalDataSourceImpl();
         final repository = DashboardRepositoryImpl(
           remoteDataSource: remoteDataSource,
@@ -68,9 +68,9 @@ class BlocProviders {
     return BlocProvider<TrackingBloc>(
       create: (context) {
         final networkInfo = context.read<NetworkInfo>();
-        final client = context.read<http.Client>();
+        final apiClient = context.read<ApiClient>();
 
-        final remoteDataSource = TrackingRemoteDataSourceImpl(client: client);
+        final remoteDataSource = TrackingRemoteDataSourceImpl(apiClient: apiClient);
         final repository = TrackingRepositoryImpl(
           remoteDataSource: remoteDataSource,
           networkInfo: networkInfo,
@@ -90,9 +90,9 @@ class BlocProviders {
     return BlocProvider<HealthBloc>(
       create: (context) {
         final networkInfo = context.read<NetworkInfo>();
-        final client = context.read<http.Client>();
+        final apiClient = context.read<ApiClient>();
 
-        final remoteDataSource = HealthRemoteDataSourceImpl(client: client);
+        final remoteDataSource = HealthRemoteDataSourceImpl(apiClient: apiClient);
         final repository = HealthRepositoryImpl(
           remoteDataSource: remoteDataSource,
           networkInfo: networkInfo,
@@ -112,9 +112,9 @@ class BlocProviders {
     return BlocProvider<FeedingBloc>(
       create: (context) {
         final networkInfo = context.read<NetworkInfo>();
-        final client = context.read<http.Client>();
+        final apiClient = context.read<ApiClient>();
 
-        final remoteDataSource = FeedingRemoteDataSourceImpl(client: client);
+        final remoteDataSource = FeedingRemoteDataSourceImpl(apiClient: apiClient);
         final repository = FeedingRepositoryImpl(
           remoteDataSource: remoteDataSource,
           networkInfo: networkInfo,
@@ -134,9 +134,9 @@ class BlocProviders {
     return BlocProvider<AlertsBloc>(
       create: (context) {
         final networkInfo = context.read<NetworkInfo>();
-        final client = context.read<http.Client>();
+        final apiClient = context.read<ApiClient>();
 
-        final remoteDataSource = AlertRemoteDataSourceImpl(client: client);
+        final remoteDataSource = AlertRemoteDataSourceImpl(apiClient: apiClient);
         final localDataSource = AlertLocalDataSourceImpl();
         final repository = AlertRepositoryImpl(
           remoteDataSource: remoteDataSource,
@@ -157,9 +157,9 @@ class BlocProviders {
     return BlocProvider<AudioBloc>(
       create: (context) {
         final networkInfo = context.read<NetworkInfo>();
-        final client = context.read<http.Client>();
+        final apiClient = context.read<ApiClient>();
 
-        final remoteDataSource = AudioRemoteDataSourceImpl(client: client);
+        final remoteDataSource = AudioRemoteDataSourceImpl(apiClient: apiClient);
         final repository = AudioRepositoryImpl(
           remoteDataSource: remoteDataSource,
           networkInfo: networkInfo,

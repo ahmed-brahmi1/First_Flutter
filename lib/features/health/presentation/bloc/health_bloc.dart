@@ -1,5 +1,4 @@
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:dartz/dartz.dart';
 
 import '../../../../core/errors/failures.dart';
 import '../../../../core/usecases/usecase.dart';
@@ -34,9 +33,8 @@ class HealthBloc extends Bloc<HealthEvent, HealthState> {
         } else {
           emit(HealthLoaded(latestSensor: sensor));
         }
-
-      } catch (e) {
-        emit(HealthError(e.toString()));
+      } catch (_) {
+        emit(const HealthError('Failed to load latest health sensor data.'));
       }
     });
 
@@ -85,6 +83,18 @@ class HealthBloc extends Bloc<HealthEvent, HealthState> {
   }
 
   String _mapFailureToMessage(Failure failure) {
-    return failure.toString();
+    if (failure is NetworkFailure) {
+      return 'Network error: ${failure.message}';
+    }
+    if (failure is AuthenticationFailure) {
+      return 'Authentication error: ${failure.message}';
+    }
+    if (failure is CacheFailure) {
+      return 'Cache error: ${failure.message}';
+    }
+    if (failure is ServerFailure) {
+      return 'Server error: ${failure.message}';
+    }
+    return failure.message;
   }
 }

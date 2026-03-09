@@ -36,8 +36,7 @@ class TrackingRepositoryImpl implements TrackingRepository {
     if (await networkInfo.isConnected) {
       try {
         // TODO: Get token from secure storage
-        const token = '';
-        final location = await remoteDataSource.getRealtimeLocation(token);
+        final location = await remoteDataSource.getRealtimeLocation();
         return Right(location);
       } on ServerException catch (e) {
         return Left(ServerFailure(e.message));
@@ -55,8 +54,6 @@ class TrackingRepositoryImpl implements TrackingRepository {
   Future<Either<Failure, Geofence>> setGeofence(Geofence geofence) async {
     if (await networkInfo.isConnected) {
       try {
-        // TODO: Get token from secure storage
-        const token = '';
         final geofenceModel = GeofenceModel(
           id: geofence.id,
           latitude: geofence.latitude,
@@ -65,7 +62,7 @@ class TrackingRepositoryImpl implements TrackingRepository {
           name: geofence.name,
           isActive: geofence.isActive,
         );
-        final result = await remoteDataSource.setGeofence(token, geofenceModel);
+        final result = await remoteDataSource.setGeofence(geofenceModel);
         return Right(result);
       } on ServerException catch (e) {
         return Left(ServerFailure(e.message));
@@ -101,8 +98,7 @@ class TrackingRepositoryImpl implements TrackingRepository {
     if (await networkInfo.isConnected) {
       try {
         // TODO: Get token from secure storage
-        const token = '';
-        final locations = await remoteDataSource.getLocationHistory(token, start, end);
+        final locations = await remoteDataSource.getLocationHistory(start, end);
         return Right(locations);
       } on ServerException catch (e) {
         return Left(ServerFailure(e.message));

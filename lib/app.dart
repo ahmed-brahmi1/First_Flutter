@@ -3,21 +3,18 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'config/theme.dart';
 import 'config/routes.dart';
 import 'features/auth/presentation/bloc/auth_bloc.dart';
+import 'features/auth/presentation/bloc/auth_event.dart';
 import 'features/auth/domain/usecases/login.dart';
 import 'features/auth/domain/usecases/register.dart';
 import 'features/auth/domain/usecases/logout.dart';
+import 'features/auth/domain/usecases/restore_session.dart';
 import 'features/auth/data/repositories/auth_repository_impl.dart';
 import 'features/auth/data/datasources/auth_remote_datasource.dart';
 import 'features/auth/data/datasources/auth_local_datasource.dart';
-import 'features/dashboard/presentation/bloc/dashboard_bloc.dart';
-import 'features/dashboard/presentation/bloc/dashboard_event.dart';
-import 'features/dashboard/domain/usecases/get_pet_status.dart';
-import 'features/dashboard/domain/usecases/get_location.dart';
-import 'features/dashboard/domain/usecases/get_health_data.dart';
-import 'features/dashboard/data/repositories/dashboard_repository_impl.dart';
-import 'features/dashboard/data/datasources/dashboard_remote_datasource.dart';
-import 'features/dashboard/data/datasources/dashboard_local_datasource.dart';
+import 'features/auth/data/datasources/auth_token_provider.dart';
 import 'core/network/network_info.dart';
+import 'core/network/api_client.dart';
+import 'core/network/token_provider.dart';
 import 'package:http/http.dart' as http;
 import 'package:shared_preferences/shared_preferences.dart';
 
@@ -50,18 +47,31 @@ class App extends StatelessWidget {
             RepositoryProvider<http.Client>(
               create: (_) => http.Client(),
             ),
+            RepositoryProvider<AuthLocalDataSource>(
+              create: (context) => AuthLocalDataSourceImpl(
+                sharedPreferences: context.read<SharedPreferences>(),
+              ),
+            ),
+            RepositoryProvider<TokenProvider>(
+              create: (context) => AuthTokenProvider(
+                context.read<AuthLocalDataSource>(),
+              ),
+            ),
+            RepositoryProvider<ApiClient>(
+              create: (context) => ApiClient(
+                context.read<http.Client>(),
+                tokenProvider: context.read<TokenProvider>(),
+              ),
+            ),
           ],
           child: MultiBlocProvider(
             providers: [
               BlocProvider<AuthBloc>(
                 create: (context) {
                   final networkInfo = context.read<NetworkInfo>();
-                  final client = context.read<http.Client>();
-                  final sharedPrefs = context.read<SharedPreferences>();
-
-                  final remoteDataSource = AuthRemoteDataSourceImpl(client: client);
-                  final localDataSource = AuthLocalDataSourceImpl(
-                    sharedPreferences: sharedPrefs,
+                  final localDataSource = context.read<AuthLocalDataSource>();
+                  final remoteDataSource = AuthRemoteDataSourceImpl(
+                    apiClient: context.read<ApiClient>(),
                   );
                   final repository = AuthRepositoryImpl(
                     remoteDataSource: remoteDataSource,
@@ -73,27 +83,8 @@ class App extends StatelessWidget {
                     login: Login(repository),
                     register: Register(repository),
                     logout: Logout(repository),
-                  );
-                },
-              ),
-              BlocProvider<DashboardBloc>(
-                create: (context) {
-                  final networkInfo = context.read<NetworkInfo>();
-                  final client = context.read<http.Client>();
-
-                  final remoteDataSource = DashboardRemoteDataSourceImpl(client: client);
-                  final localDataSource = DashboardLocalDataSourceImpl();
-                  final repository = DashboardRepositoryImpl(
-                    remoteDataSource: remoteDataSource,
-                    localDataSource: localDataSource,
-                    networkInfo: networkInfo,
-                  );
-
-                  return DashboardBloc(
-                    getPetStatus: GetPetStatus(repository),
-                    getLocation: GetLocation(repository),
-                    getHealthData: GetHealthData(repository),
-                  )..add(const LoadDashboardData());
+                    restoreSession: RestoreSession(repository),
+                  )..add(AuthStatusChecked());
                 },
               ),
             ],

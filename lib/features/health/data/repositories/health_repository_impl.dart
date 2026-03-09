@@ -40,9 +40,7 @@ class HealthRepositoryImpl implements HealthRepository {
     
     if (await networkInfo.isConnected) {
       try {
-        // TODO: Get token from secure storage
-        const token = '';
-        final logs = await remoteDataSource.getTemperatureHistory(token, start, end);
+        final logs = await remoteDataSource.getTemperatureHistory(start, end);
         return Right(logs);
       } on ServerException catch (e) {
         return Left(ServerFailure(e.message));
@@ -75,9 +73,7 @@ class HealthRepositoryImpl implements HealthRepository {
     
     if (await networkInfo.isConnected) {
       try {
-        // TODO: Get token from secure storage
-        const token = '';
-        final predictions = await remoteDataSource.getAIPredictions(token);
+        final predictions = await remoteDataSource.getAIPredictions();
         return Right(predictions);
       } on ServerException catch (e) {
         return Left(ServerFailure(e.message));
